@@ -1,0 +1,53 @@
+service: aws-lambda-saul-project
+frameworkVersion: '3'
+
+provider:
+  name: aws
+  runtime: nodejs18.x
+  region: sa-east-1
+  iamRoleStatements:
+    - Effect: Allow
+      Action:
+        - dynamodb:*
+      Resource:
+        - arn:aws:dynamodb:sa-east-1:324744050088:table/planetsTable
+
+functions:
+  api:
+    handler: src/index.handler
+    events:
+      - httpApi:
+          path: /
+          method: get
+  apiPeople:
+    handler: src/getPeople.getPeople
+    events:
+      - httpApi:
+          path: /getPeople
+          method: get
+  createPlanets:
+    handler: src/addPlanets.addPlanets
+    events:
+      - httpApi:
+          path: /addplanets
+          method: post
+  getPlanets:
+    handler: src/getPlanets.getPlanets
+    events:
+      - httpApi:
+          path: /listplanets
+          method: get
+
+resources:
+  Resources:
+    planetsTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: planetsTable
+        BillingMode: PAY_PER_REQUEST
+        AttributeDefinitions:
+          - AttributeName: id 
+            AttributeType: S
+        KeySchema:
+          - AttributeName: id
+            KeyType: HASH
